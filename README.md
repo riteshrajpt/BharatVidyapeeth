@@ -8,9 +8,6 @@ BharatVidyapeeth is an EdTech platform designed to empower students by providing
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
