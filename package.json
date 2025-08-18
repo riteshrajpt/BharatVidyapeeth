@@ -1,6 +1,6 @@
 {
-  "name": "bharatvidyapeeth-client",
-  "description": "This is the client side of the BharatVidyapeeth App",
+  "name": "lumora-client",
+  "description": "This is the client side of the lumora App",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

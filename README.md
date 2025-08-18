@@ -1,6 +1,6 @@
-# BharatVidyapeeth Edtech Project
+# Lumora OTT Project
 
-BharatVidyapeeth is an EdTech platform designed to empower students by providing access to quality educational content. This project aims to provide a range of features that help students and educators interact efficiently, offering resources, courses, assessments, and communication tools.
+Lumora OTT is an EdTech platform designed to empower students by providing access to quality educational content. This project aims to provide a range of features that help students and educators interact efficiently, offering resources, courses, assessments, and communication tools.
 
 ## Table of Contents
 
@@ -11,9 +11,9 @@ BharatVidyapeeth is an EdTech platform designed to empower students by providing
 
 ## Introduction
 
-The **BharatVidyapeeth Edtech Project** is built with the goal of transforming the education experience through an interactive online learning platform. It serves as a bridge between educators and students, offering easy-to-access educational materials, tools for remote learning, and much more.
+The **Lumora OTT Project** is built with the goal of transforming the education experience through an interactive online learning platform. It serves as a bridge between educators and students, offering easy-to-access educational materials, tools for remote learning, and much more.
 
-The project supports functionalities like course listings, student assessments, educator-student communication, and real-time feedback. By leveraging technology, BharatVidyapeeth strives to make learning engaging and effective.
+The project supports functionalities like course listings, student assessments, educator-student communication, and real-time feedback. By leveraging technology, Lumora OTT strives to make learning engaging and effective.
 
 ## Features
 
@@ -41,4 +41,4 @@ Follow these steps to set up the project locally:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/riteshrajpt/BharatVidyapeeth.git
+   git clone https://github.com/riteshrajpt/Lumora OTT.git

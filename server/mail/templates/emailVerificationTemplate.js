@@ -67,11 +67,11 @@ const otpTemplate = (otp) => {
 	<body>
 		<div class="container">
 			<a href="https://BharatVidyapeeth-edtech-project.vercel.app"><img class="logo"
-					src="https://res.cloudinary.com/dybyjyfvl/image/upload/v1709394926/CodeHelp/Logo-Full-Dark_armdce.png" alt="BharatVidyapeeth Logo"></a>
+					src="https://res.cloudinary.com/dybyjyfvl/image/upload/v1709394926/CodeHelp/Logo-Full-Dark_armdce.png" alt="Lumora Logo"></a>
 			<div class="message">OTP Verification Email</div>
 			<div class="body">
 				<p>Dear User,</p>
-				<p>Thank you for registering with BharatVidyapeeth. To complete your registration, please use the following OTP
+				<p>Thank you for registering with Lumora. To complete your registration, please use the following OTP
 					(One-Time Password) to verify your account:</p>
 				<h2 class="highlight">${otp}</h2>
 				<p>This OTP is valid for 5 minutes. If you did not request this verification, please disregard this email.

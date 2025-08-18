@@ -1,14 +1,14 @@
 {
-	"name": "bharatvidyapeeth-backend",
+	"name": "lumora-backend",
 	"version": "1.0.0",
-	"description": "BharatVidyapeeth-backend",
+	"description": "lumora-backend",
 	"main": "index.js",
 	"scripts": {
 		"start": "node index.js",
 		"dev": "nodemon index.js"
 	},
 	"keywords": [
-		"BharatVidyapeeth-backend"
+		"lumora-backend"
 	],
 	"author": "Saikat Mukherjee",
 	"license": "ISC",
