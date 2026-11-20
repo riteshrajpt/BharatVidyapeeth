@@ -40,7 +40,7 @@ export function getUserDetails(token, navigate) {
 
 export async function getUserEnrolledCourses(token) {
   const toastId = toast.loading("Loading...")
-  let result = []
+  let result = null
   try {
     const response = await apiConnector(
       "GET",

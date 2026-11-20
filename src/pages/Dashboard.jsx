@@ -1,30 +1,20 @@
 import { useSelector } from "react-redux"
 import { Outlet } from "react-router-dom"
 
+import { LoadingState } from "../components/Common/PageState"
 import Sidebar from "../components/core/Dashboard/Sidebar"
 
-function Dashboard() {
+export default function Dashboard() {
   const { loading: profileLoading } = useSelector((state) => state.profile)
   const { loading: authLoading } = useSelector((state) => state.auth)
-
-  if (profileLoading || authLoading) {
-    return (
-      <div className="grid min-h-[calc(100vh-3.5rem)] place-items-center">
-        <div className="spinner"></div>
-      </div>
-    )
-  }
-
+  if (profileLoading || authLoading)
+    return <LoadingState message="Opening your learning space…" />
   return (
-    <div className="relative flex min-h-[calc(100vh-3.5rem)]">
+    <div className="dashboard-layout">
       <Sidebar />
-      <div className="h-[calc(100vh-3.5rem)] flex-1 overflow-auto">
-        <div className="mx-auto w-11/12 max-w-[1000px] py-10">
-          <Outlet />
-        </div>
+      <div className="dashboard-content legacy-workspace">
+        <Outlet />
       </div>
     </div>
   )
 }
-
-export default Dashboard

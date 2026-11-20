@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react"
-import { BsChevronDown } from "react-icons/bs"
-import { IoIosArrowBack } from "react-icons/io"
+import { FiCheckCircle, FiChevronDown, FiPlayCircle } from "react-icons/fi"
 import { useSelector } from "react-redux"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
-
-import IconBtn from "../../Common/IconBtn"
+import { Link, useParams } from "react-router-dom"
 
 export default function VideoDetailsSidebar({ setReviewModal }) {
-  const [activeStatus, setActiveStatus] = useState("")
-  const [videoBarActive, setVideoBarActive] = useState("")
-  const navigate = useNavigate()
-  const location = useLocation()
   const { sectionId, subSectionId } = useParams()
   const {
     courseSectionData,
@@ -18,114 +11,87 @@ export default function VideoDetailsSidebar({ setReviewModal }) {
     totalNoOfLectures,
     completedLectures,
   } = useSelector((state) => state.viewCourse)
-
-  useEffect(() => {
-    ;(() => {
-      if (!courseSectionData.length) return
-      const currentSectionIndx = courseSectionData.findIndex(
-        (data) => data._id === sectionId
+  const [expanded, setExpanded] = useState(sectionId)
+  useEffect(() => setExpanded(sectionId), [sectionId])
+  const progress = totalNoOfLectures
+    ? Math.min(
+        100,
+        Math.round((completedLectures.length / totalNoOfLectures) * 100)
       )
-      const currentSubSectionIndx = courseSectionData?.[
-        currentSectionIndx
-      ]?.subSection.findIndex((data) => data._id === subSectionId)
-      const activeSubSectionId =
-        courseSectionData[currentSectionIndx]?.subSection?.[
-          currentSubSectionIndx
-        ]?._id
-      setActiveStatus(courseSectionData?.[currentSectionIndx]?._id)
-      setVideoBarActive(activeSubSectionId)
-    })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseSectionData, courseEntireData, location.pathname])
-
+    : 0
   return (
-    <>
-      <div className="flex h-[calc(100vh-3.5rem)] w-[320px] max-w-[350px] flex-col border-r-[1px] border-r-richblack-700 bg-richblack-800">
-        <div className="mx-5 flex flex-col items-start justify-between gap-2 gap-y-4 border-b border-richblack-600 py-5 text-lg font-bold text-richblack-25">
-          <div className="flex w-full items-center justify-between ">
-            <div
-              onClick={() => {
-                navigate(`/dashboard/enrolled-courses`)
-              }}
-              className="flex h-[35px] w-[35px] items-center justify-center rounded-full bg-richblack-100 p-1 text-richblack-700 hover:scale-90"
-              title="back"
-            >
-              <IoIosArrowBack size={30} />
-            </div>
-            <IconBtn
-              text="Add Review"
-              customClasses="ml-auto"
-              onclick={() => setReviewModal(true)}
-            />
-          </div>
-          <div className="flex flex-col">
-            <p>{courseEntireData?.courseName}</p>
-            <p className="text-sm font-semibold text-richblack-500">
-              {completedLectures?.length} / {totalNoOfLectures}
-            </p>
-          </div>
-        </div>
-
-        <div className="h-[calc(100vh - 5rem)] overflow-y-auto">
-          {courseSectionData.map((course, index) => (
-            <div
-              className="mt-2 cursor-pointer text-sm text-richblack-5"
-              onClick={() => setActiveStatus(course?._id)}
-              key={index}
-            >
-              {/* Section */}
-              <div className="flex flex-row justify-between bg-richblack-600 px-5 py-4">
-                <div className="w-[70%] font-semibold">
-                  {course?.sectionName}
-                </div>
-                <div className="flex items-center gap-3">
-                  {/* <span className="text-[12px] font-medium">
-                    Lession {course?.subSection.length}
-                  </span> */}
-                  <span
-                    className={`${
-                      activeStatus === course?.sectionName
-                        ? "rotate-0"
-                        : "rotate-180"
-                    } transition-all duration-500`}
-                  >
-                    <BsChevronDown />
-                  </span>
-                </div>
-              </div>
-
-              {/* Sub Sections */}
-              {activeStatus === course?._id && (
-                <div className="transition-[height] duration-500 ease-in-out">
-                  {course.subSection.map((topic, i) => (
-                    <div
-                      className={`flex gap-3  px-5 py-2 ${
-                        videoBarActive === topic._id
-                          ? "bg-yellow-200 font-semibold text-richblack-800"
-                          : "hover:bg-richblack-900"
-                      } `}
-                      key={i}
-                      onClick={() => {
-                        navigate(
-                          `/view-course/${courseEntireData?._id}/section/${course?._id}/sub-section/${topic?._id}`
-                        )
-                        setVideoBarActive(topic._id)
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={completedLectures.includes(topic?._id)}
-                        onChange={() => {}}
-                      />
-                      {topic.title}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+    <aside className="lesson-sidebar">
+      <Link to="/dashboard/enrolled-courses" className="text-link">
+        Back to my learning
+      </Link>
+      <h2>{courseEntireData.courseName}</h2>
+      <div className="lesson-progress">
+        {completedLectures.length} of {totalNoOfLectures} lessons complete ·{" "}
+        {progress}%
       </div>
-    </>
+      <div
+        className="progress-track"
+        role="progressbar"
+        aria-label="Course progress"
+        aria-valuenow={progress}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <span style={{ width: `${progress}%` }} />
+      </div>
+      <nav aria-label="Course lessons">
+        {courseSectionData.map((section) => (
+          <div className="lesson-section" key={section._id}>
+            <button
+              onClick={() =>
+                setExpanded((current) =>
+                  current === section._id ? "" : section._id
+                )
+              }
+              aria-expanded={expanded === section._id}
+              aria-controls={`lesson-section-${section._id}`}
+            >
+              <span>{section.sectionName}</span>
+              <FiChevronDown
+                style={{
+                  transform:
+                    expanded === section._id ? "rotate(180deg)" : undefined,
+                }}
+              />
+            </button>
+            <div
+              hidden={expanded !== section._id}
+              id={`lesson-section-${section._id}`}
+            >
+              {section.subSection?.map((lesson) => (
+                <Link
+                  key={lesson._id}
+                  to={`/view-course/${courseEntireData._id}/section/${section._id}/sub-section/${lesson._id}`}
+                  className={`lesson-link ${
+                    subSectionId === lesson._id ? "active" : ""
+                  }`}
+                  aria-current={
+                    subSectionId === lesson._id ? "page" : undefined
+                  }
+                >
+                  {completedLectures.includes(lesson._id) ? (
+                    <FiCheckCircle />
+                  ) : (
+                    <FiPlayCircle />
+                  )}
+                  <span>{lesson.title}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
+      <button
+        className="button button-secondary button-full mt-6"
+        onClick={() => setReviewModal(true)}
+      >
+        Share your experience
+      </button>
+    </aside>
   )
 }

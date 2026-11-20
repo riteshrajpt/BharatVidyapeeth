@@ -2,10 +2,7 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 
-import {
-  fetchCourseDetails,
-  getFullDetailsOfCourse,
-} from "../../../../services/operations/courseDetailsAPI"
+import { getFullDetailsOfCourse } from "../../../../services/operations/courseDetailsAPI"
 import { setCourse, setEditCourse } from "../../../../slices/courseSlice"
 import RenderSteps from "../AddCourse/RenderSteps"
 
@@ -39,9 +36,16 @@ export default function EditCourse() {
 
   return (
     <div>
-      <h1 className="mb-14 text-3xl font-medium text-richblack-5">
-        Edit Course
-      </h1>
+      <header className="workspace-heading">
+        <div>
+          <span className="eyebrow">MAKE A GOOD COURSE EVEN BETTER</span>
+          <h1>A little refinement. A bigger impact.</h1>
+          <p>
+            Update your course details, organize lessons, and help your learners
+            move forward.
+          </p>
+        </div>
+      </header>
       <div className="mx-auto max-w-[600px]">
         {course ? (
           <RenderSteps />

@@ -1,28 +1,64 @@
-import IconBtn from "./IconBtn"
+import { useEffect, useRef } from "react"
 
 export default function ConfirmationModal({ modalData }) {
+  const panel = useRef(null)
+  useEffect(() => {
+    const previous = document.activeElement
+    const dialog = panel.current
+    dialog?.querySelector("button")?.focus()
+    const keyboard = (event) => {
+      if (event.key === "Escape") modalData.btn2Handler?.()
+      if (event.key === "Tab") {
+        const buttons = dialog.querySelectorAll("button")
+        const first = buttons[0]
+        const last = buttons[buttons.length - 1]
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault()
+          last.focus()
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault()
+          first.focus()
+        }
+      }
+    }
+    document.addEventListener("keydown", keyboard)
+    return () => {
+      document.removeEventListener("keydown", keyboard)
+      previous?.focus?.()
+    }
+  }, [modalData])
   return (
-    <div className="fixed inset-0 z-[1000] !mt-0 grid place-items-center overflow-auto bg-white bg-opacity-10 backdrop-blur-sm">
-      <div className="w-11/12 max-w-[350px] rounded-lg border border-richblack-400 bg-richblack-800 p-6">
-        <p className="text-2xl font-semibold text-richblack-5">
-          {modalData?.text1}
-        </p>
-        <p className="mt-3 mb-5 leading-6 text-richblack-200">
-          {modalData?.text2}
-        </p>
-        <div className="flex items-center gap-x-4">
-          <IconBtn
-            onclick={modalData?.btn1Handler}
-            text={modalData?.btn1Text}
-          />
+    <div
+      className="modal-overlay"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) modalData.btn2Handler?.()
+      }}
+    >
+      <section
+        className="modal-panel"
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirmation-title"
+        aria-describedby="confirmation-description"
+      >
+        <h2 id="confirmation-title">{modalData.text1}</h2>
+        <p id="confirmation-description">{modalData.text2}</p>
+        <div className="modal-actions">
           <button
-            className="cursor-pointer rounded-md bg-richblack-200 py-[8px] px-[20px] font-semibold text-richblack-900"
-            onClick={modalData?.btn2Handler}
+            className="button button-primary"
+            onClick={modalData.btn1Handler}
           >
-            {modalData?.btn2Text}
+            {modalData.btn1Text}
+          </button>
+          <button
+            className="button button-secondary"
+            onClick={modalData.btn2Handler}
+          >
+            {modalData.btn2Text}
           </button>
         </div>
-      </div>
+      </section>
     </div>
   )
 }

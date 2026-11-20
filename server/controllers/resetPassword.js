@@ -1,6 +1,6 @@
 const User = require("../models/User")
 const mailSender = require("../utils/mailSender")
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcryptjs")
 const crypto = require("crypto")
 exports.resetPasswordToken = async (req, res) => {
   try {
@@ -14,7 +14,7 @@ exports.resetPasswordToken = async (req, res) => {
     }
     const token = crypto.randomBytes(20).toString("hex")
 
-    const updatedDetails = await User.findOneAndUpdate(
+    await User.findOneAndUpdate(
       { email: email },
       {
         token: token,
@@ -22,15 +22,13 @@ exports.resetPasswordToken = async (req, res) => {
       },
       { new: true }
     )
-    console.log("DETAILS", updatedDetails)
-
-    // const url = `http://localhost:3000/update-password/${token}`
-    const url = `https://BharatVidyapeeth-edtech-project.vercel.app/update-password/${token}`
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000"
+    const url = new URL(`/update-password/${token}`, frontendUrl).toString()
 
     await mailSender(
       email,
       "Password Reset",
-      `Your Link for email verification is ${url}. Please click this url to reset your password.`
+      `To reset your password, open <a href="${url}">${url}</a>. This link expires in 1 hour.`
     )
 
     res.json({

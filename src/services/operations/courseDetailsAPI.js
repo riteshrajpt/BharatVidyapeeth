@@ -1,6 +1,5 @@
 import { toast } from "react-hot-toast"
 
-import { updateCompletedLectures } from "../../slices/viewCourseSlice"
 // import { setLoading } from "../../slices/profileSlice";
 import { apiConnector } from "../apiConnector"
 import { courseEndpoints } from "../apis"
@@ -57,7 +56,10 @@ export const fetchCourseDetails = async (courseId) => {
     result = response.data
   } catch (error) {
     console.log("COURSE_DETAILS_API API ERROR............", error)
-    result = error.response.data
+    result = error.response?.data || {
+      success: false,
+      message: "The course is unavailable. Please try again.",
+    }
     // toast.error(error.response.data.message);
   }
   toast.dismiss(toastId)
@@ -261,7 +263,7 @@ export const deleteSubSection = async (data, token) => {
 
 // fetching all courses under a specific instructor
 export const fetchInstructorCourses = async (token) => {
-  let result = []
+  let result = null
   const toastId = toast.loading("Loading...")
   try {
     const response = await apiConnector(

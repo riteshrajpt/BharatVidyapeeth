@@ -1,123 +1,121 @@
-import React from "react"
+import { FiBookOpen, FiCompass, FiHeart } from "react-icons/fi"
+import { Link } from "react-router-dom"
 
-import FoundingStory from "../assets/Images/FoundingStory.png"
-import BannerImage1 from "../assets/Images/aboutus1.webp"
-import BannerImage2 from "../assets/Images/aboutus2.webp"
-import BannerImage3 from "../assets/Images/aboutus3.webp"
+import story from "../assets/Images/FoundingStory.png"
+import imageOne from "../assets/Images/aboutus1.webp"
+import imageTwo from "../assets/Images/aboutus2.webp"
+import imageThree from "../assets/Images/aboutus3.webp"
 import Footer from "../components/Common/Footer"
-import ReviewSlider from "../components/Common/ReviewSlider"
-import ContactFormSection from "../components/core/AboutPage/ContactFormSection"
-import LearningGrid from "../components/core/AboutPage/LearningGrid"
-import Quote from "../components/core/AboutPage/Quote"
-import StatsComponenet from "../components/core/AboutPage/Stats"
-import HighlightText from "../components/core/HomePage/HighlightText"
 
-const About = () => {
+export default function About() {
   return (
-    <div>
-      <section className="bg-richblack-700">
-        <div className="relative mx-auto flex w-11/12 max-w-maxContent flex-col justify-between gap-10 text-center text-white">
-          <header className="mx-auto py-20 text-4xl font-semibold lg:w-[70%]">
-            Driving Innovation in Online Education for a
-            <HighlightText text={"Brighter Future"} />
-            <p className="mx-auto mt-3 text-center text-base font-medium text-richblack-300 lg:w-[95%]">
-              BharatVidyapeeth is at the forefront of driving innovation in online
-              education. We're passionate about creating a brighter future by
-              offering cutting-edge courses, leveraging emerging technologies,
-              and nurturing a vibrant learning community.
-            </p>
-          </header>
-          <div className="sm:h-[70px] lg:h-[150px]"></div>
-          <div className="absolute bottom-0 left-[50%] grid w-[100%] translate-x-[-50%] translate-y-[30%] grid-cols-3 gap-3 lg:gap-5">
-            <img src={BannerImage1} alt="" />
-            <img src={BannerImage2} alt="" />
-            <img src={BannerImage3} alt="" />
+    <>
+      <section className="about-hero">
+        <div className="container">
+          <span className="eyebrow">A LITTLE ABOUT OUR WHY</span>
+          <h1>
+            A brighter future starts
+            <br />
+            with <span className="text-green">a curious mind.</span>
+          </h1>
+          <p>
+            We believe learning should open doors, spark ideas, and help you see
+            what’s possible. BharatVidyapeeth is a space to take that next step,
+            wherever you’re starting from.
+          </p>
+          <div className="about-gallery">
+            <img
+              src={imageOne}
+              alt="Students sharing ideas in a learning space"
+            />
+            <img src={imageTwo} alt="A moment of focus and discovery" />
+            <img
+              src={imageThree}
+              alt="Learners exploring something new together"
+            />
           </div>
         </div>
       </section>
-
-      <section className="border-b border-richblack-700">
-        <div className="mx-auto flex w-11/12 max-w-maxContent flex-col justify-between gap-10 text-richblack-500">
-          <div className="h-[100px] "></div>
-          <Quote />
+      <section className="section-pad story-grid container">
+        <img
+          src={story}
+          alt="The people and ideas behind our learning community"
+          loading="lazy"
+        />
+        <div>
+          <span className="eyebrow">OUR STORY</span>
+          <h2>
+            Good education
+            <br />
+            should go <span className="text-green">beyond walls.</span>
+          </h2>
+          <p>
+            Our story starts with a simple idea: the opportunity to learn
+            shouldn’t depend on where you live or what your schedule looks like.
+          </p>
+          <p>
+            We’re bringing educators and curious minds together in one place.
+            With practical courses, room to practice, and a pace you can make
+            your own, we want learning to feel like a possibility, not another
+            barrier.
+          </p>
+          <Link to="/courses" className="button button-primary">
+            Find your next skill
+          </Link>
         </div>
       </section>
-
-      <section>
-        <div className="mx-auto flex w-11/12 max-w-maxContent flex-col justify-between gap-10 text-richblack-500">
-          <div className="flex flex-col items-center gap-10 lg:flex-row justify-between">
-            <div className="my-24 flex lg:w-[50%] flex-col gap-10">
-              <h1 className="bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCB045] bg-clip-text text-4xl font-semibold text-transparent lg:w-[70%] ">
-                Our Founding Story
-              </h1>
-              <p className="text-base font-medium text-richblack-300 lg:w-[95%]">
-                Our e-learning platform was born out of a shared vision and
-                passion for transforming education. It all began with a group of
-                educators, technologists, and lifelong learners who recognized
-                the need for accessible, flexible, and high-quality learning
-                opportunities in a rapidly evolving digital world.
-              </p>
-              <p className="text-base font-medium text-richblack-300 lg:w-[95%]">
-                As experienced educators ourselves, we witnessed firsthand the
-                limitations and challenges of traditional education systems. We
-                believed that education should not be confined to the walls of a
-                classroom or restricted by geographical boundaries. We
-                envisioned a platform that could bridge these gaps and empower
-                individuals from all walks of life to unlock their full
-                potential.
-              </p>
-            </div>
-
-            <div>
-              <img
-                src={FoundingStory}
-                alt=""
-                className="shadow-[0_0_20px_0] shadow-[#FC6767]"
-              />
-            </div>
+      <section className="how-section section-pad">
+        <div className="container">
+          <div className="section-header centered">
+            <span className="eyebrow">WHAT WE BELIEVE</span>
+            <h2>
+              Built around you.
+              <br />
+              Made for what’s next.
+            </h2>
           </div>
-          <div className="flex flex-col items-center lg:gap-10 lg:flex-row justify-between">
-            <div className="my-24 flex lg:w-[40%] flex-col gap-10">
-              <h1 className="bg-gradient-to-b from-[#FF512F] to-[#F09819] bg-clip-text text-4xl font-semibold text-transparent lg:w-[70%] ">
-                Our Vision
-              </h1>
-              <p className="text-base font-medium text-richblack-300 lg:w-[95%]">
-                With this vision in mind, we set out on a journey to create an
-                e-learning platform that would revolutionize the way people
-                learn. Our team of dedicated experts worked tirelessly to
-                develop a robust and intuitive platform that combines
-                cutting-edge technology with engaging content, fostering a
-                dynamic and interactive learning experience.
-              </p>
-            </div>
-            <div className="my-24 flex lg:w-[40%] flex-col gap-10">
-              <h1 className="bg-gradient-to-b from-[#1FA2FF] via-[#12D8FA] to-[#A6FFCB] text-transparent bg-clip-text text-4xl font-semibold lg:w-[70%] ">
-              Our Mission
-              </h1>
-              <p className="text-base font-medium text-richblack-300 lg:w-[95%]">
-              Our mission goes beyond just delivering courses online. We wanted to create a vibrant community of learners, where individuals can connect, collaborate, and learn from one another. We believe that knowledge thrives in an environment of sharing and dialogue, and we foster this spirit of collaboration through forums, live sessions, and networking opportunities.
-              </p>
-            </div>
+          <div className="values-grid">
+            {[
+              [
+                FiCompass,
+                "Curiosity comes first",
+                "A good question can change your direction. We make space for exploration, discovery, and finding what excites you.",
+              ],
+              [
+                FiBookOpen,
+                "Knowledge is for sharing",
+                "The best teachers bring more than answers. They bring their experience, a fresh perspective, and a way to make things click.",
+              ],
+              [
+                FiHeart,
+                "Progress is personal",
+                "Your journey won’t look like anyone else’s. Learn at your own pace, celebrate the small steps, and keep moving forward.",
+              ],
+            ].map(([Icon, title, text]) => (
+              <article key={title} className="value-card">
+                <Icon />
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
-
-      <StatsComponenet />
-      <section className="mx-auto mt-20 flex w-11/12 max-w-maxContent flex-col justify-between gap-10 text-white">
-        <LearningGrid />
-        <ContactFormSection />
+      <section className="section-pad container">
+        <div className="catalog-help">
+          <span className="note-icon">
+            <FiHeart />
+          </span>
+          <div>
+            <h2>Bring your curiosity. We’ll meet you there.</h2>
+            <p>Explore your next skill or help someone discover theirs.</p>
+          </div>
+          <Link to="/signup" className="button button-primary">
+            Find your place
+          </Link>
+        </div>
       </section>
-
-      <div className="relative mx-auto my-20 flex w-11/12 max-w-maxContent flex-col items-center justify-between gap-8 bg-richblack-900 text-white">
-        {/* Reviws from Other Learner */}
-        <h1 className="text-center text-4xl font-semibold mt-8">
-          Reviews from other learners
-        </h1>
-        <ReviewSlider />
-      </div>
       <Footer />
-    </div>
+    </>
   )
 }
-
-export default About

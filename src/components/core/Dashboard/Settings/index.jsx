@@ -6,16 +6,16 @@ import UpdatePassword from "./UpdatePassword"
 export default function Settings() {
   return (
     <>
-      <h1 className="mb-14 text-3xl font-medium text-richblack-5">
-        Edit Profile
-      </h1>
-      {/* Change Profile Picture */}
+      <header className="workspace-heading">
+        <div>
+          <span className="eyebrow">MAKE YOURSELF AT HOME</span>
+          <h1>Your account, your way.</h1>
+          <p>Keep your profile up to date and your learning space yours.</p>
+        </div>
+      </header>
       <ChangeProfilePicture />
-      {/* Profile */}
       <EditProfile />
-      {/* Password */}
       <UpdatePassword />
-      {/* Delete Account */}
       <DeleteAccount />
     </>
   )

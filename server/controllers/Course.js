@@ -211,9 +211,14 @@ exports.getAllCourses = async (req, res) => {
         instructor: true,
         ratingAndReviews: true,
         studentsEnrolled: true,
+        category: true,
+        courseDescription: true,
+        createdAt: true,
       }
     )
-      .populate("instructor")
+      .populate("instructor", "firstName lastName image")
+      .populate("category", "name")
+      .populate("ratingAndReviews", "rating")
       .exec()
 
     return res.status(200).json({
@@ -289,8 +294,10 @@ exports.getCourseDetails = async (req, res) => {
     })
       .populate({
         path: "instructor",
+        select: "firstName lastName image additionalDetails",
         populate: {
           path: "additionalDetails",
+          select: "about",
         },
       })
       .populate("category")

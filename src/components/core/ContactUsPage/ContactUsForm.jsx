@@ -1,188 +1,165 @@
-import React, { useEffect, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 
-import CountryCode from "../../../data/countrycode.json"
 import { apiConnector } from "../../../services/apiConnector"
 import { contactusEndpoint } from "../../../services/apis"
 
-const ContactUsForm = () => {
+export default function ContactUsForm() {
   const [loading, setLoading] = useState(false)
+  const [feedback, setFeedback] = useState(null)
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitSuccessful },
-  } = useForm()
-
-  const submitContactForm = async (data) => {
-    // console.log("Form Data - ", data)
+    formState: { errors },
+  } = useForm({ defaultValues: { countrycode: "+91" } })
+  const submit = async (data) => {
+    setLoading(true)
+    setFeedback(null)
     try {
-      setLoading(true)
-      const res = await apiConnector(
+      const response = await apiConnector(
         "POST",
         contactusEndpoint.CONTACT_US_API,
         data
       )
-      // console.log("Email Res - ", res)
-      setLoading(false)
-    } catch (error) {
-      console.log("ERROR MESSAGE - ", error.message)
+      if (!response.data.success) throw new Error("Unable to send")
+      setFeedback({
+        success: true,
+        message:
+          "Your message was received. Check your inbox for a confirmation.",
+      })
+      reset({
+        firstname: "",
+        lastname: "",
+        email: "",
+        countrycode: "+91",
+        phoneNo: "",
+        message: "",
+      })
+    } catch {
+      setFeedback({
+        success: false,
+        message:
+          "We couldn’t send your message. Please try again or email us directly.",
+      })
+    } finally {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset({
-        email: "",
-        firstname: "",
-        lastname: "",
-        message: "",
-        phoneNo: "",
-      })
-    }
-  }, [reset, isSubmitSuccessful])
-
   return (
-    <form
-      className="flex flex-col gap-7"
-      onSubmit={handleSubmit(submitContactForm)}
-    >
-      <div className="flex flex-col gap-5 lg:flex-row">
-        <div className="flex flex-col gap-2 lg:w-[48%]">
-          <label htmlFor="firstname" className="lable-style">
-            First Name
-          </label>
-          <input
-            type="text"
-            name="firstname"
-            id="firstname"
-            placeholder="Enter first name"
-            className="form-style"
-            {...register("firstname", { required: true })}
-          />
-          {errors.firstname && (
-            <span className="-mt-1 text-[12px] text-yellow-100">
-              Please enter your name.
-            </span>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 lg:w-[48%]">
-          <label htmlFor="lastname" className="lable-style">
-            Last Name
-          </label>
-          <input
-            type="text"
-            name="lastname"
-            id="lastname"
-            placeholder="Enter last name"
-            className="form-style"
-            {...register("lastname")}
-          />
-        </div>
+    <form className="auth-form" onSubmit={handleSubmit(submit)}>
+      <div className="field-row">
+        {[
+          ["firstname", "First name", true, "given-name"],
+          ["lastname", "Last name", false, "family-name"],
+        ].map(([name, label, required, autocomplete]) => (
+          <div className="field" key={name}>
+            <label className="field-label" htmlFor={`contact-${name}`}>
+              {label}
+              {!required && " (optional)"}
+            </label>
+            <input
+              className="form-style"
+              id={`contact-${name}`}
+              autoComplete={autocomplete}
+              placeholder={label}
+              aria-invalid={!!errors[name]}
+              {...register(name, { required })}
+            />
+            {errors[name] && (
+              <span className="form-error" role="alert">
+                Please enter your first name.
+              </span>
+            )}
+          </div>
+        ))}
       </div>
-
-      <div className="flex flex-col gap-2">
-        <label htmlFor="email" className="lable-style">
-          Email Address
+      <div className="field">
+        <label className="field-label" htmlFor="contact-email">
+          Email address
         </label>
         <input
+          id="contact-email"
           type="email"
-          name="email"
-          id="email"
-          placeholder="Enter email address"
+          autoComplete="email"
           className="form-style"
+          placeholder="you@example.com"
+          aria-invalid={!!errors.email}
           {...register("email", { required: true })}
         />
         {errors.email && (
-          <span className="-mt-1 text-[12px] text-yellow-100">
-            Please enter your Email address.
+          <span className="form-error" role="alert">
+            Please enter your email address.
           </span>
         )}
       </div>
-
-      <div className="flex flex-col gap-2">
-        <label htmlFor="phonenumber" className="lable-style">
-          Phone Number
+      <div className="field">
+        <label className="field-label" htmlFor="contact-phone">
+          Phone number
         </label>
-
-        <div className="flex gap-5">
-          <div className="flex w-[81px] flex-col gap-2">
-            <select
-              type="text"
-              name="firstname"
-              id="firstname"
-              placeholder="Enter first name"
-              className="form-style"
-              {...register("countrycode", { required: true })}
-            >
-              {CountryCode.map((ele, i) => {
-                return (
-                  <option key={i} value={ele.code}>
-                    {ele.code} -{ele.country}
-                  </option>
-                )
-              })}
-            </select>
-          </div>
-          <div className="flex w-[calc(100%-90px)] flex-col gap-2">
-            <input
-              type="number"
-              name="phonenumber"
-              id="phonenumber"
-              placeholder="12345 67890"
-              className="form-style"
-              {...register("phoneNo", {
-                required: {
-                  value: true,
-                  message: "Please enter your Phone Number.",
-                },
-                maxLength: { value: 12, message: "Invalid Phone Number" },
-                minLength: { value: 10, message: "Invalid Phone Number" },
-              })}
-            />
-          </div>
+        <div className="contact-phone">
+          <input
+            aria-label="Country calling code"
+            className="form-style"
+            autoComplete="tel-country-code"
+            {...register("countrycode", {
+              required: true,
+              pattern: /^\+?\d{1,4}$/,
+            })}
+          />
+          <input
+            id="contact-phone"
+            className="form-style"
+            type="tel"
+            autoComplete="tel-national"
+            placeholder="Your phone number"
+            aria-invalid={!!errors.phoneNo}
+            {...register("phoneNo", {
+              required: true,
+              pattern: /^[\d\s()+-]{7,20}$/,
+            })}
+          />
         </div>
-        {errors.phoneNo && (
-          <span className="-mt-1 text-[12px] text-yellow-100">
-            {errors.phoneNo.message}
+        {(errors.phoneNo || errors.countrycode) && (
+          <span className="form-error" role="alert">
+            Please enter a valid phone number and country code.
           </span>
         )}
       </div>
-
-      <div className="flex flex-col gap-2">
-        <label htmlFor="message" className="lable-style">
-          Message
+      <div className="field">
+        <label className="field-label" htmlFor="contact-message">
+          What’s on your mind?
         </label>
         <textarea
-          name="message"
-          id="message"
-          cols="30"
-          rows="7"
-          placeholder="Enter your message here"
+          id="contact-message"
+          rows={5}
           className="form-style"
-          {...register("message", { required: true })}
+          placeholder="Tell us a little about how we can help…"
+          aria-invalid={!!errors.message}
+          {...register("message", { required: true, maxLength: 5000 })}
         />
         {errors.message && (
-          <span className="-mt-1 text-[12px] text-yellow-100">
-            Please enter your Message.
+          <span className="form-error" role="alert">
+            Please include a message, up to 5,000 characters.
           </span>
         )}
       </div>
-
+      {feedback && (
+        <div
+          className={feedback.success ? "form-feedback" : "form-error"}
+          role="status"
+        >
+          {feedback.message}
+        </div>
+      )}
       <button
-        disabled={loading}
+        className="button button-primary button-full"
         type="submit"
-        className={`rounded-md bg-yellow-50 px-6 py-3 text-center text-[13px] font-bold text-black shadow-[2px_2px_0px_0px_rgba(255,255,255,0.18)] 
-         ${
-           !loading &&
-           "transition-all duration-200 hover:scale-95 hover:shadow-none"
-         }  disabled:bg-richblack-500 sm:text-[16px] `}
+        disabled={loading}
+        aria-busy={loading}
       >
-        Send Message
+        {loading ? "Sending your message…" : "Send my message"}
       </button>
     </form>
   )
 }
-
-export default ContactUsForm

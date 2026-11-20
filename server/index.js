@@ -1,3 +1,6 @@
+// Load configuration before importing routes that use service credentials.
+require("dotenv").config();
+
 // Importing necessary modules and packages
 const express = require("express");
 const app = express();
@@ -11,13 +14,10 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { cloudinaryConnect } = require("./config/cloudinary");
 const fileUpload = require("express-fileupload");
-const dotenv = require("dotenv");
+const mongoose = require("mongoose");
 
 // Setting up port number
 const PORT = process.env.PORT || 4000;
-
-// Loading environment variables from .env file
-dotenv.config();
 
 // Connecting to database
 database.connect();
@@ -42,6 +42,15 @@ app.use(
 cloudinaryConnect();
 
 // Setting up routes
+app.use(["/api/v1/auth", "/api/v1/profile", "/api/v1/course", "/api/v1/payment"], (req, res, next) => {
+	if (mongoose.connection.readyState !== 1) {
+		return res.status(503).json({
+			success: false,
+			message: "Database unavailable. Configure MONGODB_URL in server/.env.",
+		});
+	}
+	next();
+});
 app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/course", courseRoutes);
@@ -53,6 +62,7 @@ app.get("/", (req, res) => {
 	return res.json({
 		success: true,
 		message: "Your server is up and running ...",
+		database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
 	});
 });
 

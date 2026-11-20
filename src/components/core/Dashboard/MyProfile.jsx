@@ -1,122 +1,98 @@
-import { RiEditBoxLine } from "react-icons/ri"
 import { useSelector } from "react-redux"
-import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
-import { formattedDate } from "../../../utils/dateFormatter"
-import IconBtn from "../../Common/IconBtn"
+import { ACCOUNT_TYPE } from "../../../utils/constants"
+import Avatar from "../../Common/Avatar"
 
 export default function MyProfile() {
   const { user } = useSelector((state) => state.profile)
-  const navigate = useNavigate()
-
+  const details = user?.additionalDetails || {}
+  const personal = [
+    ["First name", user?.firstName],
+    ["Last name", user?.lastName],
+    ["Email address", user?.email],
+    ["Phone number", details.contactNumber],
+    ["Gender", details.gender],
+    [
+      "Date of birth",
+      details.dateOfBirth
+        ? new Date(details.dateOfBirth).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })
+        : null,
+    ],
+  ]
   return (
     <>
-      <h1 className="mb-14 text-3xl font-medium text-richblack-5">
-        My Profile
-      </h1>
-      <div className="flex items-center justify-between rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-8 px-12">
-        <div className="flex items-center gap-x-4">
-          <img
-            src={user?.image}
-            alt={`profile-${user?.firstName}`}
-            className="aspect-square w-[78px] rounded-full object-cover"
-          />
-          <div className="space-y-1">
-            <p className="text-lg font-semibold text-richblack-5">
-              {user?.firstName + " " + user?.lastName}
-            </p>
-            <p className="text-sm text-richblack-300">{user?.email}</p>
+      <header className="workspace-heading">
+        <div>
+          <span className="eyebrow">A LITTLE PROGRESS, EVERY DAY</span>
+          <h1>Hello, {user?.firstName || "curious mind"}.</h1>
+          <p>Here’s to the next thing you’ll learn, build, or discover.</p>
+        </div>
+        <Link
+          className="button button-primary"
+          to={
+            user?.accountType === ACCOUNT_TYPE.INSTRUCTOR
+              ? "/dashboard/my-courses"
+              : "/dashboard/enrolled-courses"
+          }
+        >
+          {user?.accountType === ACCOUNT_TYPE.INSTRUCTOR
+            ? "My courses"
+            : "Continue learning"}
+        </Link>
+      </header>
+      <section className="profile-cover">
+        <div className="profile-person">
+          <Avatar user={user} />
+          <div>
+            <h2>
+              {user?.firstName} {user?.lastName}
+            </h2>
+            <p>{user?.email}</p>
+            <span className="profile-badge">
+              {user?.accountType} · Always learning
+            </span>
           </div>
         </div>
-        <IconBtn
-          text="Edit"
-          onclick={() => {
-            navigate("/dashboard/settings")
-          }}
+        <Link
+          to="/dashboard/settings"
+          className="button button-secondary button-small"
         >
-          <RiEditBoxLine />
-        </IconBtn>
-      </div>
-      <div className="my-10 flex flex-col gap-y-10 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-8 px-12">
-        <div className="flex w-full items-center justify-between">
-          <p className="text-lg font-semibold text-richblack-5">About</p>
-          <IconBtn
-            text="Edit"
-            onclick={() => {
-              navigate("/dashboard/settings")
-            }}
-          >
-            <RiEditBoxLine />
-          </IconBtn>
+          Edit my profile
+        </Link>
+      </section>
+      <section className="surface-card">
+        <div className="surface-heading">
+          <h2>A little about you</h2>
+          <Link className="text-link" to="/dashboard/settings">
+            Edit
+          </Link>
         </div>
-        <p
-          className={`${
-            user?.additionalDetails?.about
-              ? "text-richblack-5"
-              : "text-richblack-400"
-          } text-sm font-medium`}
-        >
-          {user?.additionalDetails?.about ?? "Write Something About Yourself"}
+        <p>
+          {details.about ||
+            "Your story is still being written. Add a little about yourself, your interests, or what you’re hoping to learn."}
         </p>
-      </div>
-      <div className="my-10 flex flex-col gap-y-10 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-8 px-12">
-        <div className="flex w-full items-center justify-between">
-          <p className="text-lg font-semibold text-richblack-5">
-            Personal Details
-          </p>
-          <IconBtn
-            text="Edit"
-            onclick={() => {
-              navigate("/dashboard/settings")
-            }}
-          >
-            <RiEditBoxLine />
-          </IconBtn>
+      </section>
+      <section className="surface-card">
+        <div className="surface-heading">
+          <h2>The details that make you, you</h2>
+          <Link className="text-link" to="/dashboard/settings">
+            Update details
+          </Link>
         </div>
-        <div className="flex max-w-[500px] justify-between">
-          <div className="flex flex-col gap-y-5">
-            <div>
-              <p className="mb-2 text-sm text-richblack-600">First Name</p>
-              <p className="text-sm font-medium text-richblack-5">
-                {user?.firstName}
-              </p>
+        <dl className="profile-details-grid">
+          {personal.map(([label, value]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{value || "Not added yet"}</dd>
             </div>
-            <div>
-              <p className="mb-2 text-sm text-richblack-600">Email</p>
-              <p className="text-sm font-medium text-richblack-5">
-                {user?.email}
-              </p>
-            </div>
-            <div>
-              <p className="mb-2 text-sm text-richblack-600">Gender</p>
-              <p className="text-sm font-medium text-richblack-5">
-                {user?.additionalDetails?.gender ?? "Add Gender"}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-y-5">
-            <div>
-              <p className="mb-2 text-sm text-richblack-600">Last Name</p>
-              <p className="text-sm font-medium text-richblack-5">
-                {user?.lastName}
-              </p>
-            </div>
-            <div>
-              <p className="mb-2 text-sm text-richblack-600">Phone Number</p>
-              <p className="text-sm font-medium text-richblack-5">
-                {user?.additionalDetails?.contactNumber ?? "Add Contact Number"}
-              </p>
-            </div>
-            <div>
-              <p className="mb-2 text-sm text-richblack-600">Date Of Birth</p>
-              <p className="text-sm font-medium text-richblack-5">
-                {formattedDate(user?.additionalDetails?.dateOfBirth) ??
-                  "Add Date Of Birth"}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+          ))}
+        </dl>
+      </section>
     </>
   )
 }

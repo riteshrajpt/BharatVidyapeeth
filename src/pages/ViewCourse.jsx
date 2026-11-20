@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Outlet, useParams } from "react-router-dom"
 
+import { ErrorState, LoadingState } from "../components/Common/PageState"
 import CourseReviewModal from "../components/core/ViewCourse/CourseReviewModal"
 import VideoDetailsSidebar from "../components/core/ViewCourse/VideoDetailsSidebar"
 import { getFullDetailsOfCourse } from "../services/operations/courseDetailsAPI"
@@ -13,35 +14,58 @@ import {
 } from "../slices/viewCourseSlice"
 
 export default function ViewCourse() {
-  const { courseId } = useParams()
-  const { token } = useSelector((state) => state.auth)
+  const { courseId } = useParams(),
+    { token } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
-  const [reviewModal, setReviewModal] = useState(false)
-
+  const [reviewModal, setReviewModal] = useState(false),
+    [loading, setLoading] = useState(true),
+    [error, setError] = useState(false),
+    [revision, setRevision] = useState(0)
   useEffect(() => {
-    ;(async () => {
-      const courseData = await getFullDetailsOfCourse(courseId, token)
-      // console.log("Course Data here... ", courseData.courseDetails)
-      dispatch(setCourseSectionData(courseData.courseDetails.courseContent))
-      dispatch(setEntireCourseData(courseData.courseDetails))
-      dispatch(setCompletedLectures(courseData.completedVideos))
-      let lectures = 0
-      courseData?.courseDetails?.courseContent?.forEach((sec) => {
-        lectures += sec.subSection.length
+    let active = true
+    setLoading(true)
+    setError(false)
+    getFullDetailsOfCourse(courseId, token)
+      .then((data) => {
+        if (!data?.courseDetails) throw new Error("Course unavailable")
+        if (!active) return
+        const sections = data.courseDetails.courseContent || []
+        dispatch(setCourseSectionData(sections))
+        dispatch(setEntireCourseData(data.courseDetails))
+        dispatch(setCompletedLectures(data.completedVideos || []))
+        dispatch(
+          setTotalNoOfLectures(
+            sections.reduce(
+              (sum, section) => sum + (section.subSection?.length || 0),
+              0
+            )
+          )
+        )
       })
-      dispatch(setTotalNoOfLectures(lectures))
-    })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
+      .catch(() => {
+        if (active) setError(true)
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [courseId, token, dispatch, revision])
+  if (loading) return <LoadingState message="Getting your next lesson ready…" />
+  if (error)
+    return (
+      <ErrorState
+        retry={() => setRevision((value) => value + 1)}
+        message="We couldn’t open this course. Check that you’re enrolled and try again."
+      />
+    )
   return (
     <>
-      <div className="relative flex min-h-[calc(100vh-3.5rem)]">
+      <div className="lesson-layout">
         <VideoDetailsSidebar setReviewModal={setReviewModal} />
-        <div className="h-[calc(100vh-3.5rem)] flex-1 overflow-auto">
-          <div className="mx-6">
-            <Outlet />
-          </div>
+        <div className="lesson-content">
+          <Outlet />
         </div>
       </div>
       {reviewModal && <CourseReviewModal setReviewModal={setReviewModal} />}

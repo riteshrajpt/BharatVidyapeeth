@@ -1,52 +1,56 @@
-import { FcGoogle } from "react-icons/fc"
-import { useSelector } from "react-redux"
+import { FiCheckCircle } from "react-icons/fi"
+import { Link } from "react-router-dom"
 
-import frameImg from "../../../assets/Images/frame.png"
 import LoginForm from "./LoginForm"
 import SignupForm from "./SignupForm"
 
-function Template({ title, description1, description2, image, formType }) {
-  const { loading } = useSelector((state) => state.auth)
-
+export default function Template({ image, formType }) {
+  const signup = formType === "signup"
   return (
-    <div className="grid min-h-[calc(100vh-3.5rem)] place-items-center">
-      {loading ? (
-        <div className="spinner"></div>
-      ) : (
-        <div className="mx-auto flex w-11/12 max-w-maxContent flex-col-reverse justify-between gap-y-12 py-12 md:flex-row md:gap-y-0 md:gap-x-12">
-          <div className="mx-auto w-11/12 max-w-[450px] md:mx-0">
-            <h1 className="text-[1.875rem] font-semibold leading-[2.375rem] text-richblack-5">
-              {title}
-            </h1>
-            <p className="mt-4 text-[1.125rem] leading-[1.625rem]">
-              <span className="text-richblack-100">{description1}</span>{" "}
-              <span className="font-edu-sa font-bold italic text-blue-100">
-                {description2}
-              </span>
-            </p>
-            {formType === "signup" ? <SignupForm /> : <LoginForm />}
-          </div>
-          <div className="relative mx-auto w-11/12 max-w-[450px] md:mx-0">
-            <img
-              src={frameImg}
-              alt="Pattern"
-              width={558}
-              height={504}
-              loading="lazy"
-            />
-            <img
-              src={image}
-              alt="Students"
-              width={558}
-              height={504}
-              loading="lazy"
-              className="absolute -top-4 right-4 z-10"
-            />
-          </div>
+    <section className="auth-layout">
+      <div className="auth-main">
+        <span className="eyebrow">
+          {signup
+            ? "A FRESH START, A NEW SKILL"
+            : "YOUR NEXT CHAPTER IS WAITING"}
+        </span>
+        <h1>
+          {signup
+            ? "A little curiosity. Endless possibilities."
+            : "Good to have you back."}
+        </h1>
+        <p className="auth-description">
+          {signup
+            ? "Create your account and take the first step toward something you’ve always wanted to learn."
+            : "Pick up where you left off. Your next breakthrough might be one lesson away."}
+        </p>
+        {signup ? <SignupForm /> : <LoginForm />}
+        <p className="auth-footnote">
+          {signup ? "Already part of the community?" : "New around here?"}{" "}
+          <Link to={signup ? "/login" : "/signup"}>
+            {signup ? "Log in" : "Start your journey"}
+          </Link>
+        </p>
+      </div>
+      <aside className="auth-art">
+        <div>
+          <span className="eyebrow">A LITTLE LEARNING. A BIGGER FUTURE.</span>
+          <h2>
+            Every expert
+            <br />
+            was once
+            <br />a beginner.
+          </h2>
+          <p>
+            You bring the curiosity. We’ll help you find the confidence to keep
+            going.
+          </p>
         </div>
-      )}
-    </div>
+        <img src={image} alt="A learner enjoying a moment of discovery" />
+        <div className="auth-art-note">
+          <FiCheckCircle /> Your pace. Your goals. Your next chapter.
+        </div>
+      </aside>
+    </section>
   )
 }
-
-export default Template

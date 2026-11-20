@@ -1,90 +1,63 @@
 import { useState } from "react"
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
-import { useDispatch } from "react-redux"
-import { Link, useNavigate } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 
 import { login } from "../../../services/operations/authAPI"
+import PasswordField from "./PasswordField"
 
-function LoginForm() {
-  const navigate = useNavigate()
+export default function LoginForm() {
   const dispatch = useDispatch()
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  })
-
-  const [showPassword, setShowPassword] = useState(false)
-
-  const { email, password } = formData
-
-  const handleOnChange = (e) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [e.target.name]: e.target.value,
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { loading } = useSelector((state) => state.auth)
+  const [form, setForm] = useState({ email: "", password: "" })
+  const change = (event) =>
+    setForm((current) => ({
+      ...current,
+      [event.target.name]: event.target.value,
     }))
-  }
-
-  const handleOnSubmit = (e) => {
-    e.preventDefault()
-    dispatch(login(email, password, navigate))
-  }
-
   return (
     <form
-      onSubmit={handleOnSubmit}
-      className="mt-6 flex w-full flex-col gap-y-4"
+      className="auth-form"
+      onSubmit={(event) => {
+        event.preventDefault()
+        dispatch(
+          login(
+            form.email.trim(),
+            form.password,
+            navigate,
+            location.state?.from
+          )
+        )
+      }}
     >
-      <label className="w-full">
-        <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-5">
-          Email Address <sup className="text-pink-200">*</sup>
-        </p>
+      <label className="field">
+        <span>Email address</span>
         <input
+          type="email"
+          className="form-style"
           required
-          type="text"
           name="email"
-          value={email}
-          onChange={handleOnChange}
-          placeholder="Enter email address"
-          className="form-style w-full"
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={form.email}
+          onChange={change}
         />
       </label>
-      <label className="relative">
-        <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-5">
-          Password <sup className="text-pink-200">*</sup>
-        </p>
-        <input
-          required
-          type={showPassword ? "text" : "password"}
-          name="password"
-          value={password}
-          onChange={handleOnChange}
-          placeholder="Enter Password"
-          className="form-style w-full !pr-10"
-        />
-        <span
-          onClick={() => setShowPassword((prev) => !prev)}
-          className="absolute right-3 top-[38px] z-[10] cursor-pointer"
-        >
-          {showPassword ? (
-            <AiOutlineEyeInvisible fontSize={24} fill="#AFB2BF" />
-          ) : (
-            <AiOutlineEye fontSize={24} fill="#AFB2BF" />
-          )}
-        </span>
-        <Link to="/forgot-password">
-          <p className="mt-1 ml-auto max-w-max text-xs text-blue-100">
-            Forgot Password
-          </p>
+      <div>
+        <PasswordField value={form.password} onChange={change} />
+        <Link className="field-utility text-link" to="/forgot-password">
+          Forgot your password?
         </Link>
-      </label>
+      </div>
       <button
+        className="button button-primary button-full"
+        disabled={loading}
+        aria-busy={loading}
         type="submit"
-        className="mt-6 rounded-[8px] bg-yellow-50 py-[8px] px-[12px] font-medium text-richblack-900"
       >
-        Sign In
+        {loading ? "Logging you in…" : "Log in to your learning space"}
       </button>
     </form>
   )
 }
-
-export default LoginForm

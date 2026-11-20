@@ -1,142 +1,137 @@
 import { useEffect, useState } from "react"
+import { FiBookOpen, FiDollarSign, FiUsers } from "react-icons/fi"
 import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 
 import { fetchInstructorCourses } from "../../../services/operations/courseDetailsAPI"
 import { getInstructorData } from "../../../services/operations/profileAPI"
+import { formatPrice } from "../../Common/CourseCard"
+import { EmptyState, ErrorState, LoadingState } from "../../Common/PageState"
 import InstructorChart from "./InstructorDashboard/InstructorChart"
 
 export default function Instructor() {
-  const { token } = useSelector((state) => state.auth)
-  const { user } = useSelector((state) => state.profile)
-  const [loading, setLoading] = useState(false)
-  const [instructorData, setInstructorData] = useState(null)
-  const [courses, setCourses] = useState([])
-
+  const { token } = useSelector((state) => state.auth),
+    { user } = useSelector((state) => state.profile)
+  const [loading, setLoading] = useState(true),
+    [error, setError] = useState(false),
+    [courses, setCourses] = useState([]),
+    [stats, setStats] = useState([]),
+    [revision, setRevision] = useState(0)
   useEffect(() => {
-    ;(async () => {
-      setLoading(true)
-      const instructorApiData = await getInstructorData(token)
-      const result = await fetchInstructorCourses(token)
-      console.log(instructorApiData)
-      if (instructorApiData.length) setInstructorData(instructorApiData)
-      if (result) {
-        setCourses(result)
-      }
-      setLoading(false)
-    })()
-  }, [])
-
-  const totalAmount = instructorData?.reduce(
-    (acc, curr) => acc + curr.totalAmountGenerated,
-    0
-  )
-
-  const totalStudents = instructorData?.reduce(
-    (acc, curr) => acc + curr.totalStudentsEnrolled,
-    0
-  )
-
+    let active = true
+    setLoading(true)
+    setError(false)
+    Promise.all([getInstructorData(token), fetchInstructorCourses(token)])
+      .then(([data, result]) => {
+        if (!Array.isArray(result)) throw new Error("Unavailable courses")
+        if (active) {
+          setStats(Array.isArray(data) ? data : [])
+          setCourses(result)
+        }
+      })
+      .catch(() => {
+        if (active) setError(true)
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [token, revision])
+  const income = stats.reduce(
+      (sum, course) => sum + (course.totalAmountGenerated || 0),
+      0
+    ),
+    students = stats.reduce(
+      (sum, course) => sum + (course.totalStudentsEnrolled || 0),
+      0
+    )
   return (
-    <div>
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-richblack-5">
-          Hi {user?.firstName} 👋
-        </h1>
-        <p className="font-medium text-richblack-200">
-          Let's start something new
-        </p>
-      </div>
-      {loading ? (
-        <div className="spinner"></div>
-      ) : courses.length > 0 ? (
+    <>
+      <header className="workspace-heading">
         <div>
-          <div className="my-4 flex h-[450px] space-x-4">
-            {/* Render chart / graph */}
-            {totalAmount > 0 || totalStudents > 0 ? (
-              <InstructorChart courses={instructorData} />
-            ) : (
-              <div className="flex-1 rounded-md bg-richblack-800 p-6">
-                <p className="text-lg font-bold text-richblack-5">Visualize</p>
-                <p className="mt-4 text-xl font-medium text-richblack-50">
-                  Not Enough Data To Visualize
-                </p>
-              </div>
-            )}
-            {/* Total Statistics */}
-            <div className="flex min-w-[250px] flex-col rounded-md bg-richblack-800 p-6">
-              <p className="text-lg font-bold text-richblack-5">Statistics</p>
-              <div className="mt-4 space-y-4">
-                <div>
-                  <p className="text-lg text-richblack-200">Total Courses</p>
-                  <p className="text-3xl font-semibold text-richblack-50">
-                    {courses.length}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-lg text-richblack-200">Total Students</p>
-                  <p className="text-3xl font-semibold text-richblack-50">
-                    {totalStudents}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-lg text-richblack-200">Total Income</p>
-                  <p className="text-3xl font-semibold text-richblack-50">
-                    Rs. {totalAmount}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="rounded-md bg-richblack-800 p-6">
-            {/* Render 3 courses */}
-            <div className="flex items-center justify-between">
-              <p className="text-lg font-bold text-richblack-5">Your Courses</p>
-              <Link to="/dashboard/my-courses">
-                <p className="text-xs font-semibold text-yellow-50">View All</p>
-              </Link>
-            </div>
-            <div className="my-4 flex items-start space-x-6">
-              {courses.slice(0, 3).map((course) => (
-                <div key={course._id} className="w-1/3">
-                  <img
-                    src={course.thumbnail}
-                    alt={course.courseName}
-                    className="h-[201px] w-full rounded-md object-cover"
-                  />
-                  <div className="mt-3 w-full">
-                    <p className="text-sm font-medium text-richblack-50">
-                      {course.courseName}
-                    </p>
-                    <div className="mt-1 flex items-center space-x-2">
-                      <p className="text-xs font-medium text-richblack-300">
-                        {course.studentsEnroled.length} students
-                      </p>
-                      <p className="text-xs font-medium text-richblack-300">
-                        |
-                      </p>
-                      <p className="text-xs font-medium text-richblack-300">
-                        Rs. {course.price}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="mt-20 rounded-md bg-richblack-800 p-6 py-20">
-          <p className="text-center text-2xl font-bold text-richblack-5">
-            You have not created any courses yet
+          <span className="eyebrow">YOUR KNOWLEDGE MAKES A DIFFERENCE</span>
+          <h1>Keep inspiring, {user?.firstName}.</h1>
+          <p>
+            A little of your experience. A world of possibility for someone
+            else.
           </p>
-          <Link to="/dashboard/add-course">
-            <p className="mt-1 text-center text-lg font-semibold text-yellow-50">
-              Create a course
-            </p>
-          </Link>
         </div>
+        <Link to="/dashboard/add-course" className="button button-primary">
+          Create a course
+        </Link>
+      </header>
+      {loading ? (
+        <LoadingState message="Opening your teaching space…" />
+      ) : error ? (
+        <ErrorState retry={() => setRevision((value) => value + 1)} />
+      ) : !courses.length ? (
+        <EmptyState
+          title="Your first course could be someone’s first step."
+          description="Share something you know well. Organize your ideas, add your lessons, and help a curious mind move forward."
+          action="Create my first course"
+          to="/dashboard/add-course"
+        />
+      ) : (
+        <>
+          <div className="instructor-stats">
+            {[
+              [FiBookOpen, "Your courses", courses.length],
+              [FiUsers, "Enrolled learners", students],
+              [FiDollarSign, "Course earnings", formatPrice(income)],
+            ].map(([Icon, label, value]) => (
+              <div className="surface-card" key={label}>
+                <span className="note-icon">
+                  <Icon />
+                </span>
+                <p>{label}</p>
+                <strong>{value}</strong>
+              </div>
+            ))}
+          </div>
+          <div className="surface-card">
+            <div className="surface-heading">
+              <h2>Your teaching at a glance</h2>
+            </div>
+            {income > 0 || students > 0 ? (
+              <InstructorChart courses={stats} />
+            ) : (
+              <p>
+                Your insights will take shape as learners enroll in your
+                courses.
+              </p>
+            )}
+          </div>
+          <div className="surface-heading">
+            <h2>Your latest courses</h2>
+            <Link className="text-link" to="/dashboard/my-courses">
+              Manage all courses
+            </Link>
+          </div>
+          <div className="enrolled-grid">
+            {courses.slice(0, 4).map((course) => (
+              <article className="enrolled-card" key={course._id}>
+                <img src={course.thumbnail} alt="" />
+                <div className="enrolled-card-body">
+                  <span className="eyebrow">{course.status}</span>
+                  <h2>{course.courseName}</h2>
+                  <p>
+                    {course.studentsEnroled?.length || 0} enrolled learners ·{" "}
+                    {formatPrice(course.price)}
+                  </p>
+                  <Link
+                    to={`/dashboard/edit-course/${course._id}`}
+                    className="button button-secondary"
+                  >
+                    Manage this course
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </>
       )}
-    </div>
+    </>
   )
 }

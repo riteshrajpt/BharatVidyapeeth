@@ -1,84 +1,69 @@
 import { useState } from "react"
 import { Chart, registerables } from "chart.js"
-import { Pie } from "react-chartjs-2"
+import { Doughnut } from "react-chartjs-2"
 
 Chart.register(...registerables)
-
+const palette = [
+  "#137c56",
+  "#9cbe78",
+  "#e8aa79",
+  "#8d85b5",
+  "#67a7a5",
+  "#d1b862",
+]
 export default function InstructorChart({ courses }) {
-  // State to keep track of the currently selected chart
-  const [currChart, setCurrChart] = useState("students")
-
-  // Function to generate random colors for the chart
-  const generateRandomColors = (numColors) => {
-    const colors = []
-    for (let i = 0; i < numColors; i++) {
-      const color = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(
-        Math.random() * 256
-      )}, ${Math.floor(Math.random() * 256)})`
-      colors.push(color)
-    }
-    return colors
-  }
-
-  // Data for the chart displaying student information
-  const chartDataStudents = {
+  const [view, setView] = useState("students")
+  const data = {
     labels: courses.map((course) => course.courseName),
     datasets: [
       {
-        data: courses.map((course) => course.totalStudentsEnrolled),
-        backgroundColor: generateRandomColors(courses.length),
+        data: courses.map((course) =>
+          view === "students"
+            ? course.totalStudentsEnrolled
+            : course.totalAmountGenerated
+        ),
+        backgroundColor: courses.map(
+          (_, index) => palette[index % palette.length]
+        ),
+        borderColor: "#fff",
+        borderWidth: 4,
       },
     ],
   }
-
-  // Data for the chart displaying income information
-  const chartIncomeData = {
-    labels: courses.map((course) => course.courseName),
-    datasets: [
-      {
-        data: courses.map((course) => course.totalAmountGenerated),
-        backgroundColor: generateRandomColors(courses.length),
-      },
-    ],
-  }
-
-  // Options for the chart
-  const options = {
-    maintainAspectRatio: false,
-  }
-
   return (
-    <div className="flex flex-1 flex-col gap-y-4 rounded-md bg-richblack-800 p-6">
-      <p className="text-lg font-bold text-richblack-5">Visualize</p>
-      <div className="space-x-4 font-semibold">
-        {/* Button to switch to the "students" chart */}
+    <div className="instructor-chart">
+      <div className="filter-tabs">
         <button
-          onClick={() => setCurrChart("students")}
-          className={`rounded-sm p-1 px-3 transition-all duration-200 ${
-            currChart === "students"
-              ? "bg-richblack-700 text-yellow-50"
-              : "text-yellow-400"
-          }`}
+          className={view === "students" ? "selected" : ""}
+          onClick={() => setView("students")}
         >
-          Students
+          Enrolled learners
         </button>
-        {/* Button to switch to the "income" chart */}
         <button
-          onClick={() => setCurrChart("income")}
-          className={`rounded-sm p-1 px-3 transition-all duration-200 ${
-            currChart === "income"
-              ? "bg-richblack-700 text-yellow-50"
-              : "text-yellow-400"
-          }`}
+          className={view === "income" ? "selected" : ""}
+          onClick={() => setView("income")}
         >
-          Income
+          Course earnings
         </button>
       </div>
-      <div className="relative mx-auto aspect-square h-full w-full">
-        {/* Render the Pie chart based on the selected chart */}
-        <Pie
-          data={currChart === "students" ? chartDataStudents : chartIncomeData}
-          options={options}
+      <div className="chart-canvas">
+        <Doughnut
+          data={data}
+          options={{
+            maintainAspectRatio: false,
+            cutout: "68%",
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  font: { family: "DM Sans", size: 12 },
+                  color: "#64746b",
+                  padding: 20,
+                  usePointStyle: true,
+                },
+              },
+            },
+          }}
         />
       </div>
     </div>
